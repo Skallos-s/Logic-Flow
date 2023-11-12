@@ -101,97 +101,97 @@ const menuHeight = 130; // settings menu height
 
 // inference rules
 const infRules = ["",                // unselected
-				  "Assume",          // assume
-				  AND + " intro",    // and    intro
-				  AND + " elim",     // and    elim
-				  OR  + " intro",    // or     intro
-				  OR  + " elim",     // or     elim
-				  NOT + " intro",    // not    intro
-				  NOT + " elim",     // not    elim
-				  IF  + " intro",    // cond   intro
-				  IF  + " elim",     // cond   elim
-				  IFF + " intro",    // bicond intro
-				  IFF + " elim",     // bicond elim
-				  "= intro",         // equals intro
-				  "= elim",          // equals elim
-				  FORALL + " intro", // forall intro
-				  FORALL + " elim",  // forall elim
-				  EXISTS + " intro", // exists intro
-				  EXISTS + " elim"]; // exists elim
+                  "Assume",          // assume
+                  AND + " intro",    // and    intro
+                  AND + " elim",     // and    elim
+                  OR  + " intro",    // or     intro
+                  OR  + " elim",     // or     elim
+                  NOT + " intro",    // not    intro
+                  NOT + " elim",     // not    elim
+                  IF  + " intro",    // cond   intro
+                  IF  + " elim",     // cond   elim
+                  IFF + " intro",    // bicond intro
+                  IFF + " elim",     // bicond elim
+                  "= intro",         // equals intro
+                  "= elim",          // equals elim
+                  FORALL + " intro", // forall intro
+                  FORALL + " elim",  // forall elim
+                  EXISTS + " intro", // exists intro
+                  EXISTS + " elim"]; // exists elim
 
 // inference rules functions
 // input is node, no output
 // modifies node.valid, node.scope, and node.error
 const infRulesFuncs = [(node) => {}, // null function
-					   funcAssume,
-					   funcAndIntro,
-					   funcAndElim,
-					   funcOrIntro,
-					   funcOrElim,
-					   funcNotIntro,
-					   funcNotElim,
-					   funcIfIntro,
-					   funcIfElim,
-					   funcIffIntro,
-					   funcIffElim,
-					   funcEqualsIntro,
-					   funcEqualsElim,
-					   funcForallIntro,
-					   funcForallElim,
-					   funcExistsIntro,
-					   funcExistsElim];  
+                       funcAssume,
+                       funcAndIntro,
+                       funcAndElim,
+                       funcOrIntro,
+                       funcOrElim,
+                       funcNotIntro,
+                       funcNotElim,
+                       funcIfIntro,
+                       funcIfElim,
+                       funcIffIntro,
+                       funcIffElim,
+                       funcEqualsIntro,
+                       funcEqualsElim,
+                       funcForallIntro,
+                       funcForallElim,
+                       funcExistsIntro,
+                       funcExistsElim];  
 
 // error messages
 const errMesgs = ["No error",
-		  /* 1*/  "Error: invalid formula",
-		  /* 2*/  "Error: empty formula",
-		  /* 3*/  "Error: missing identifier",
-		  /* 4*/  "Error: circular logic",
-		  /* 5*/  "Error: variable is already bound",
-		  /* 6*/  "Error: variable cannot be both bound and free",
-		  /* 7*/  "Error: no selected inference rule",
-		  /* 8*/  "Error: imvalid identifier",
-		  /* 9*/  "Error: too few arguments",
-		  /*10*/  "Error: missing input propositions",
-		  /*11*/  "Error: unmatched input propositions",
-		  /*12*/  "Error: assumptions cannot have inputs",
-		  /*13*/  "Error: conjunction is not introduced",
-		  /*14*/  "Error: conjunction is not eliminated",
-		  /*15*/  "Error: proposition is not found in conjunction",
-		  /*16*/  "Error: disjunction is not introduced",
-		  /*17*/  "Error: proposition is not found in disjunction",
-		  /*18*/  "Error: disjunction is not eliminated",
-		  /*19*/  "Error: proposition is not derived from case",
-		  /*20*/  "Error: negation is not introduced",
-		  /*21*/  "Error: input propositions are not a contradiction",
-		  /*22*/  "Error: negation of proposition is not in scope of inputs",
-		  /*23*/  "Error: negation is not eliminated",
-		  /*24*/  "Error: conditional is not introduced",
-		  /*25*/  "Error: input is not consequent of conditional",
-		  /*26*/  "Error: antecedent of conditional is not in scope of input",
-		  /*27*/  "Error: proposition is not consequent of conditional",
-		  /*28*/  "Error: input is not antecedent of conditional",
-		  /*29*/  "Error: conditional is not eliminated",
-		  /*30*/  "Error: biconditional is not introduced",
-		  /*31*/  "Error: biconditional is not eliminated",
-		  /*32*/  "Error: equality introduction cannot have inputs",
-		  /*33*/  "Error: equality is not introduced",
-		  /*34*/  "Error: propositions are not equal",
-		  /*35*/  "Error: equality is not eliminated",
-		  /*36*/  "Error: cannot equate bound variables",
-		  /*37*/  "Error: universal quantifier is not introduced",
-		  /*38*/  "Error: bound variable is present in input",
-		  /*39*/  "Error: proposition is not generalization of input",
-		  /*40*/  "Error: arbitrary variable generalized to multiple bound variables",
-		  /*41*/  "Error: arbitrary variable of input is present in proposition",
-		  /*42*/  "Error: arbitrary variable of input is free in scope of input",
-		  /*43*/  "Error: universal quantifier is not eliminated",
-		  /*44*/  "Error: input proposition has invalid quantifer form",
-		  /*45*/  "Error: bound variable is assigned several propositions",
-		  /*46*/  "Error: bound variable of input is free in proposition",
-		  /*47*/  "Error: bound variable is not assigned",
-		  /*48*/  "Error: cannot substitute bound variables",
-		  /*49*/  "Error: unassigned bound variables"];
+          /* 1*/  "Error: invalid formula",
+          /* 2*/  "Error: empty formula",
+          /* 3*/  "Error: missing identifier",
+          /* 4*/  "Error: circular logic",
+          /* 5*/  "Error: variable is already bound",
+          /* 6*/  "Error: variable cannot be both bound and free",
+          /* 7*/  "Error: no selected inference rule",
+          /* 8*/  "Error: imvalid identifier",
+          /* 9*/  "Error: too few arguments",
+          /*10*/  "Error: missing input propositions",
+          /*11*/  "Error: unmatched input propositions",
+          /*12*/  "Error: assumptions cannot have inputs",
+          /*13*/  "Error: conjunction is not introduced",
+          /*14*/  "Error: conjunction is not eliminated",
+          /*15*/  "Error: proposition is not found in conjunction",
+          /*16*/  "Error: disjunction is not introduced",
+          /*17*/  "Error: proposition is not found in disjunction",
+          /*18*/  "Error: disjunction is not eliminated",
+          /*19*/  "Error: proposition is not derived from case",
+          /*20*/  "Error: negation is not introduced",
+          /*21*/  "Error: input propositions are not a contradiction",
+          /*22*/  "Error: negation of proposition is not in scope of inputs",
+          /*23*/  "Error: negation is not eliminated",
+          /*24*/  "Error: conditional is not introduced",
+          /*25*/  "Error: input is not consequent of conditional",
+          /*26*/  "Error: antecedent of conditional is not in scope of input",
+          /*27*/  "Error: proposition is not consequent of conditional",
+          /*28*/  "Error: input is not antecedent of conditional",
+          /*29*/  "Error: conditional is not eliminated",
+          /*30*/  "Error: biconditional is not introduced",
+          /*31*/  "Error: biconditional is not eliminated",
+          /*32*/  "Error: equality introduction cannot have inputs",
+          /*33*/  "Error: equality is not introduced",
+          /*34*/  "Error: propositions are not equal",
+          /*35*/  "Error: equality is not eliminated",
+          /*36*/  "Error: cannot equate bound variables",
+          /*37*/  "Error: universal quantifier is not introduced",
+          /*38*/  "Error: bound variable is present in input",
+          /*39*/  "Error: proposition is not generalization of input",
+          /*40*/  "Error: arbitrary variable generalized to multiple bound variables",
+          /*41*/  "Error: arbitrary variable of input is present in proposition",
+          /*42*/  "Error: arbitrary variable of input is free in scope of input",
+          /*43*/  "Error: universal quantifier is not eliminated",
+          /*44*/  "Error: input proposition has invalid quantifer form",
+          /*45*/  "Error: bound variable is assigned several propositions",
+          /*46*/  "Error: bound variable of input is free in proposition",
+          /*47*/  "Error: bound variable is not assigned",
+          /*48*/  "Error: cannot substitute bound variables",
+          /*49*/  "Error: unassigned bound variables"];
 				  
 
 // set canvas size to window size
