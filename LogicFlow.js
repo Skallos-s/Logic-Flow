@@ -69,30 +69,29 @@ const UPHI     = "\u{03A6}";
 const UUPSILON = "\u{03A8}";
 const UOMEGA   = "\u{03A9}";
 
-
 // cvs is canvas element
 // ctx is canvas context
 const cvs = document.getElementById("canvas");
 const ctx = cvs.getContext("2d");
 
 // global variable declaration
-var lastPoint      = {x: -1,
-					  y: -1}; // last mouse point
-var nodeSelectLoc  = -1;      // index of object being dragged
-var dragging       = false;   // is object being dragged?
-var newArrow       = false;   // is new arrow being made?
-var panning        = false;   // is screen is being panned?
-var nodes          = [];      // list of logic nodes
-var nodesIdTable   = [];      // translation table that maps node ID to position in nodes
-var settingsIndx   = -1;      // index of selected box, or -1
-var settingsMenu   =  0;      // selected entry in settings menu
-var settingsChild  =  0;      // selected child to be deleted
-var settingsCursor =  0;      // cursor location when typing
-var settingsClose  = false;   // settings menu close button is hovered
-var recheckLogic   = false;   // recheck logic when true
-var newNodePos     = 0;       // place to put new node
-var cameraX        = 0;       // camera x position
-var cameraY        = 0;       // camera y position
+let lastPoint      = {x: -1,
+                      y: -1}; // last mouse point
+let nodeSelectLoc  = -1;      // index of object being dragged
+let dragging       = false;   // is object being dragged?
+let newArrow       = false;   // is new arrow being made?
+let panning        = false;   // is screen is being panned?
+let nodes          = [];      // list of logic nodes
+let nodesIdTable   = [];      // translation table that maps node ID to position in nodes
+let settingsIndx   = -1;      // index of selected box, or -1
+let settingsMenu   =  0;      // selected entry in settings menu
+let settingsChild  =  0;      // selected child to be deleted
+let settingsCursor =  0;      // cursor location when typing
+let settingsClose  = false;   // settings menu close button is hovered
+let recheckLogic   = false;   // recheck logic when true
+let newNodePos     =  0;      // place to put new node
+let cameraX        =  0;      // camera x position
+let cameraY        =  0;      // camera y position
 
 // constant delaration
 const conradius  = 10;  // connector radius
@@ -239,7 +238,7 @@ class WFFClass {
 	// WFFClass recursive print method
 	// returns string
 	print() {
-		var backUp = false; // true if case gets unhit somehow
+		let backUp = false; // true if case gets unhit somehow
 		
 		if (this.name == "") return "()";      // WFF is empty
 		if (this.type == 0) { // test for special characters
@@ -327,7 +326,7 @@ class WFFClass {
 		if (this.type == 3) { // unary
 			if (this.name == "not" || this.name == "-") { // not or neg
 				// spacer character
-				var spacer = "";
+				let spacer = "";
 				
 				if (this.name == "not") spacer = NOT;
 				if (this.name == "-")   spacer = NEG;
@@ -342,8 +341,8 @@ class WFFClass {
 			} else backUp = true; // back up case
 		}
 		if (this.type == 4) { // n-ary
-			var check = false; // check if name is any of options
-			var spacer = ""; // spacer character
+			let check = false; // check if name is any of options
+			let spacer = ""; // spacer character
 			
 			// assign correct spacer character and mark that name is the correct type
 			if (this.name == "and"     ) {check = true; spacer = AND;}
@@ -374,9 +373,9 @@ class WFFClass {
 			if (this.name == "subseteq") {check = true; spacer = SUBSETEQ;}
 			
 			if (check) {
-				var prt = []; // array of string form of arguments
+				let prt = []; // array of string form of arguments
 				// loop over arguments
-				for (var i = 0; i < this.args.length; i++) {
+				for (let i = 0; i < this.args.length; i++) {
 					// check if argument is of lower type
 					if (this.type > this.args[i].type) {
 						// push string form of argument
@@ -391,14 +390,14 @@ class WFFClass {
 				return prt.join(spacer);
 			} else if (this.name == "if" || this.name == "iff") { // if, iff
 				// antecedent and consequent string form
-				var antecedent = this.args[0].print();
-				var consequent = this.args[1].print();
+				let antecedent = this.args[0].print();
+				let consequent = this.args[1].print();
 				
 				// add surrounding parens when one is of higher or equal type
 				if (this.type <= this.args[0].type) antecedent = "(" + antecedent + ")";
 				if (this.type <= this.args[1].type) consequent = "(" + consequent + ")";
 				
-				var spacer = ""; // spacer character
+				let spacer = ""; // spacer character
 				
 				// assign correct spacer character
 				if (this.name == "if" ) spacer = IF;
@@ -410,13 +409,13 @@ class WFFClass {
 		}
 		if (this.type == 5) { // quantifier
 			if (this.name == "forall" || this.name == "exists") { // forall
-				var prt = []; // array of string form of arguments
-				for (var i = 0; i < this.args.length - 1; i++) {
+				let prt = []; // array of string form of arguments
+				for (let i = 0; i < this.args.length - 1; i++) {
 					// push string form of argument
 					prt.push(this.args[i].print());
 				}
 				
-				var spacer = ""; // spacer character
+				let spacer = ""; // spacer character
 				
 				// assign correct spacer character
 				if (this.name == "forall") spacer = FORALL;
@@ -433,7 +432,7 @@ class WFFClass {
 		
 		if (this.type == 2 || backUp) { // function
 			// function name
-			var name = this.name;
+			let name = this.name;
 			
 			// update name with special function names
 			if (this.name == "alpha")   name = LALPHA;
@@ -468,9 +467,9 @@ class WFFClass {
 			if (this.name == "Upsilon") name = UUPSILON;
 			if (this.name == "Omega")   name = UOMEGA;
 			
-			var prt = []; // array of string form of arguments
+			let prt = []; // array of string form of arguments
 			// loop over arguments
-			for (var i = 0; i < this.args.length; i++) {
+			for (let i = 0; i < this.args.length; i++) {
 				prt.push(this.args[i].print()); // push string form of argument
 			}
 			return name + "(" + prt.join(", ") + ")";
@@ -489,7 +488,7 @@ class WFFClass {
 		
 		// loop over arguments and compare
 		// order matters
-		for (var i = 0; i < this.args.length; i++) {
+		for (let i = 0; i < this.args.length; i++) {
 			// check if individual arguments are equal
 			if (!this.args[i].equals(WFF.args[i])) return false;
 		}
@@ -504,11 +503,11 @@ class WFFClass {
 		// check for base equality
 		if (this.equals(WFF)) return true;
 		
-		var flag1 = false; // is this argument of E?
-		var flag2 = false; // is WFF  argument of E?
+		let flag1 = false; // is this argument of E?
+		let flag2 = false; // is WFF  argument of E?
 		
 		// check for equality with each term in equals
-		for (var i = 0; i < E.args.length; i++) {
+		for (let i = 0; i < E.args.length; i++) {
 			if (E.args[i].equals(this)) flag1 = true;
 			if (E.args[i].equals(WFF))  flag2 = true;
 		}
@@ -524,7 +523,7 @@ class WFFClass {
 		
 		// loop over arguments and compare
 		// order matters
-		for (var i = 0; i < this.args.length; i++) {
+		for (let i = 0; i < this.args.length; i++) {
 			// check if individual arguments are equal
 			if (!this.args[i].equalsElim(WFF.args[i], E)) return false;
 		}
@@ -551,7 +550,7 @@ class WFFClass {
 		
 		// loop over arguments and compare
 		// order matters
-		for (var i = 0; i < this.args.length; i++) {
+		for (let i = 0; i < this.args.length; i++) {
 			// check if individual arguments are equal
 			if (!this.args[i].forallIntro(WFF.args[i], pairs)) return false;
 		}
@@ -569,10 +568,10 @@ class WFFClass {
 			// check if parent WFF is a bound variable
 			
 			// match has been made
-			var match = false;
+			let match = false;
 			
 			// loop over pairs
-			for (var i = 0; i < pairs.length; i++) {
+			for (let i = 0; i < pairs.length; i++) {
 				if (pairs[i][0] == WFF.name) {
 					match = true; // match has been made
 					
@@ -607,9 +606,9 @@ class WFFClass {
 		
 		// loop over arguments and compare
 		// order matters
-		for (var i = 0; i < WFF.args.length; i++) {
+		for (let i = 0; i < WFF.args.length; i++) {
 			// check if individual arguments are equal
-			var check = this.args[i].forallElim(WFF.args[i], pairs);
+			let check = this.args[i].forallElim(WFF.args[i], pairs);
 			
 			if (check != 0) return check;
 		}
@@ -624,7 +623,7 @@ class WFFClass {
 		if ((this.type < 2) && (this.name == atom)) return true;
 		
 		// loop over arguments
-		for (var i = 0; i < this.args.length; i++) {
+		for (let i = 0; i < this.args.length; i++) {
 			// check if argument contains atom
 			if (this.args[i].contains(atom)) return true;
 		}
@@ -641,7 +640,7 @@ class WFFClass {
 			}
 		} else if (2 <= this.type && this.type <= 4) { // check if WFF is function or operation	
 			// loop over arguments
-			for (var i = 0; i < this.args.length; i++) {
+			for (let i = 0; i < this.args.length; i++) {
 				// argument inherits bound above variables of WFF
 				this.args[i].bnda = this.bnda;
 				
@@ -658,13 +657,13 @@ class WFFClass {
 			this.free = [...new Set(this.free)];
 		} else if (this.type == 5) { // check if WFF is quantifier
 			// loop over variables
-			for (var i = 0; i < this.args.length - 1; i++) {
+			for (let i = 0; i < this.args.length - 1; i++) {
 				// push variables as bound below
 				this.bndb.push(this.args[i].name);
 			}
 			
 			// WFF argument
-			var WFF = this.args[this.args.length - 1];
+			let WFF = this.args[this.args.length - 1];
 			
 			// inherit bound abve and below variables
 			WFF.bnda = this.bnda.concat(this.bndb);
@@ -687,7 +686,7 @@ class WFFClass {
 		this.free = [];
 		
 		// loop over arguments
-		for (var i = 0; i < this.args.length; i++) {
+		for (let i = 0; i < this.args.length; i++) {
 			this.args[i].unbindVars();
 		}
 	}
@@ -725,14 +724,14 @@ class nodeClass {
 // handler for mouse down event
 function mouseDownHandler(e) {
 	// obtain x and y position inside canvas
-	var x = e.pageX - e.target.offsetLeft;
-	var y = e.pageY - e.target.offsetTop;
+	let x = e.pageX - e.target.offsetLeft;
+	let y = e.pageY - e.target.offsetTop;
 	
 	// close settings menu when clicked outide or closed
-	var wcheck1 = Math.abs(cvs.width  / 2 - x) >= menuWidth ;
-	var hcheck1 = Math.abs(cvs.height / 2 - y) >= menuHeight;
-	var wcheck2 = Math.abs(cvs.width  / 2 - menuWidth  + 15 - x) < 10;
-	var hcheck2 = Math.abs(cvs.height / 2 - menuHeight + 15 - y) < 10;
+	let wcheck1 = Math.abs(cvs.width  / 2 - x) >= menuWidth ;
+	let hcheck1 = Math.abs(cvs.height / 2 - y) >= menuHeight;
+	let wcheck2 = Math.abs(cvs.width  / 2 - menuWidth  + 15 - x) < 10;
+	let hcheck2 = Math.abs(cvs.height / 2 - menuHeight + 15 - y) < 10;
 	
 	// menu is closed
 	if ((wcheck2 && hcheck2) || wcheck1 || hcheck1) {
@@ -750,29 +749,29 @@ function mouseDownHandler(e) {
 	// then check if settings button is selected
 	// skip if settings menu is open
 	if (settingsIndx == -1) {
-		for (var i = nodes.length-1; i >= 0; i--) {
-			var node = nodes[i];
+		for (let i = nodes.length-1; i >= 0; i--) {
+			let node = nodes[i];
 			
 			// node relative coordinates
-			var nX = node.x - cameraX;
-			var nY = node.y - cameraY;
+			let nX = node.x - cameraX;
+			let nY = node.y - cameraY;
 			
 			// mouse inside box
-			var wcheck1 = Math.abs(nX-x) < node.width ;
-			var hcheck1 = Math.abs(nY-y) < node.height;
+			let wcheck1 = Math.abs(nX-x) < node.width ;
+			let hcheck1 = Math.abs(nY-y) < node.height;
 			
 			// mouse inside settings button
-			var wcheck2 = Math.abs(nX + node.width  - 15 - x) < 10;
-			var hcheck2 = Math.abs(nY + node.height - 15 - y) < 10;
+			let wcheck2 = Math.abs(nX + node.width  - 15 - x) < 10;
+			let hcheck2 = Math.abs(nY + node.height - 15 - y) < 10;
 			
 			// distance between mouse and center of output circle
-			var xdis = nX - x;
-			var ydis = nY - y + node.height + conradius;
+			let xdis = nX - x;
+			let ydis = nY - y + node.height + conradius;
 			
 			// is mouse inside any of the three elements?
-			var bool1 = wcheck1 && hcheck1;
-			var bool2 = wcheck2 && hcheck2;
-			var bool3 = Math.sqrt(xdis**2 + ydis**2) <= conradius;
+			let bool1 = wcheck1 && hcheck1;
+			let bool2 = wcheck2 && hcheck2;
+			let bool3 = Math.sqrt(xdis**2 + ydis**2) <= conradius;
 			
 			// check if output circle is selected
 			if (bool3) {
@@ -807,7 +806,7 @@ function mouseDownHandler(e) {
 			nodes.splice(nodeSelectLoc, 1);
 			
 			// update ID translation table
-			for (var i = 0; i < nodes.length; i++) {
+			for (let i = 0; i < nodes.length; i++) {
 				if (nodesIdTable[i] == nodeSelectLoc) {
 					nodesIdTable[i] = nodes.length - 1;
 				} else if (nodesIdTable[i] > nodeSelectLoc) {
@@ -836,15 +835,15 @@ function mouseUpHandler(e) {
 	if (newArrow) {
 		newArrow = false; // reuse of variable for when arrow can be made
 		// loop over nodes to check output arrow
-		for (var i = 0; i < nodes.length; i++) {
-			var node = nodes[i];
+		for (let i = 0; i < nodes.length; i++) {
+			let node = nodes[i];
 			
-			var xdis = node.x - cameraX - lastPoint.x;
-			var ydis = node.y - cameraY - lastPoint.y - node.height - conradius;
+			let xdis = node.x - cameraX - lastPoint.x;
+			let ydis = node.y - cameraY - lastPoint.y - node.height - conradius;
 			// if arrow is dropped onto input circle, note node id.
 			if (Math.sqrt(xdis**2 + ydis**2) <= conradius) {
 				newArrow = true;
-				var nodeOutputLoc = i;
+				let nodeOutputLoc = i;
 			}
 		}
 		// if new arrow can be made and no immediate loop is made, continue
@@ -884,16 +883,16 @@ function mouseUpHandler(e) {
 // handler for mouse movement event
 function moveHandler(e) {
 	// obtain x and y position inside canvas
-	var x = e.pageX - e.target.offsetLeft;
-	var y = e.pageY - e.target.offsetTop;
+	let x = e.pageX - e.target.offsetLeft;
+	let y = e.pageY - e.target.offsetTop;
 	
 	// check if box is being dragged
 	if (dragging) {
 		// change in mouse position
-		var deltaX = x - lastPoint.x;
-		var deltaY = y - lastPoint.y;
+		let deltaX = x - lastPoint.x;
+		let deltaY = y - lastPoint.y;
 
-		var node = nodes[nodeSelectLoc];
+		let node = nodes[nodeSelectLoc];
 		
 		// update node position
 		node.x += deltaX;
@@ -921,8 +920,8 @@ function moveHandler(e) {
 	
 	if (panning) {
 		// change in mouse position
-		var deltaX = x - lastPoint.x;
-		var deltaY = y - lastPoint.y;
+		let deltaX = x - lastPoint.x;
+		let deltaY = y - lastPoint.y;
 		
 		// update camera position
 		cameraX -= deltaX;
@@ -935,31 +934,31 @@ function moveHandler(e) {
 	
 	// check if mouse is over settings button unobstructed
 	
-	var hoverLoc = -1; // node with selected settings button
+	let hoverLoc = -1; // node with selected settings button
 	
 	// loop over nodes
-	for (var i = 0; i < nodes.length; i++) {
-		var node = nodes[i];
+	for (let i = 0; i < nodes.length; i++) {
+		let node = nodes[i];
 		
 		// node relative coordinates
-		var nX = node.x - cameraX;
-		var nY = node.y - cameraY;
+		let nX = node.x - cameraX;
+		let nY = node.y - cameraY;
 		
 		node.hover = false; // reset hover
 		
 		// check if box is selected
-		var wcheck1 = Math.abs(nX-x) < node.width ;
-		var hcheck1 = Math.abs(nY-y) < node.height;
+		let wcheck1 = Math.abs(nX-x) < node.width ;
+		let hcheck1 = Math.abs(nY-y) < node.height;
 		
 		// distance between mouse and center of input/output circle
-		var xdis  = nX - x;
-		var ydis1 = nY + node.height + conradius - y;
-		var ydis2 = nY - node.height - conradius - y;
+		let xdis  = nX - x;
+		let ydis1 = nY + node.height + conradius - y;
+		let ydis2 = nY - node.height - conradius - y;
 		
 		// is mouse inside any of the three elements?
-		var bool1 = wcheck1 && hcheck1;
-		var bool2 = Math.sqrt(xdis**2 + ydis1**2) <= conradius;
-		var bool3 = Math.sqrt(xdis**2 + ydis2**2) <= conradius;
+		let bool1 = wcheck1 && hcheck1;
+		let bool2 = Math.sqrt(xdis**2 + ydis1**2) <= conradius;
+		let bool3 = Math.sqrt(xdis**2 + ydis2**2) <= conradius;
 		
 		// any potential settings button is obstructed by node
 		if (bool1 || bool2 || bool3) hoverLoc = -1;
@@ -972,8 +971,8 @@ function moveHandler(e) {
 		if (wcheck2 && hcheck2) hoverLoc = i;
 		
 		// check if menu is active and selected
-		var wcheck3 = Math.abs(cvs.width  / 2 - x) <= menuWidth ;
-		var hcheck3 = Math.abs(cvs.height / 2 - y) <= menuHeight;
+		let wcheck3 = Math.abs(cvs.width  / 2 - x) <= menuWidth ;
+		let hcheck3 = Math.abs(cvs.height / 2 - y) <= menuHeight;
 		
 		// mouse is inside active menu
 		if (wcheck3 && hcheck3 && (settingsIndx >= 0)) hoverLoc = -1;
@@ -983,8 +982,8 @@ function moveHandler(e) {
 	if (hoverLoc != -1) nodes[hoverLoc].hover = true;
 	
 	// check if settings menu close button is selected
-	var wcheck = Math.abs(cvs.width  / 2 - menuWidth  + 15 - x) < 10;
-	var hcheck = Math.abs(cvs.height / 2 - menuHeight + 15 - y) < 10;
+	let wcheck = Math.abs(cvs.width  / 2 - menuWidth  + 15 - x) < 10;
+	let hcheck = Math.abs(cvs.height / 2 - menuHeight + 15 - y) < 10;
 	settingsClose = wcheck && hcheck;
 	
 	// redraw scene
@@ -999,7 +998,7 @@ function keyDownHandler(e) {
 	
 	// check if menu is active
 	if (settingsIndx >= 0) {
-		var node = nodes[settingsIndx];
+		let node = nodes[settingsIndx];
 		
 		// move menu selector arrow up or down
 		if (e.key == "ArrowUp"  ) {
@@ -1104,7 +1103,7 @@ function keyDownHandler(e) {
 		// delete child
 		if ((settingsMenu == 4) && (e.key == "Enter")) {
 			// remove node from parent list of child
-			var parents = nodes[nodesIdTable[node.children[settingsChild]]].parents;
+			let parents = nodes[nodesIdTable[node.children[settingsChild]]].parents;
 			parents.splice(parents.indexOf(node.id), 1);
 			
 			// remove child from child list of node
@@ -1122,17 +1121,17 @@ function keyDownHandler(e) {
 		// delete node
 		if ((settingsMenu == 0) && (e.key == "Enter")) {
 			// loop over nodes and update/remove children
-			for (var i = 0; i < nodes.length; i++) {
+			for (let i = 0; i < nodes.length; i++) {
 				// copy of parents and children
-				var nodeParents  = nodes[i].parents;
-				var nodeChildren = nodes[i].children;
+				let nodeParents  = nodes[i].parents;
+				let nodeChildren = nodes[i].children;
 				
 				// reset node children
 				nodes[i].parents  = [];
 				nodes[i].children = [];
 				
 				// loop over parents and add modified parents IDs
-				for (var j = 0; j < nodeParents.length; j++) {
+				for (let j = 0; j < nodeParents.length; j++) {
 					// parent ID below removed node ID
 					if (nodeParents[j] < node.id) {
 						nodes[i].parents.push(nodeParents[j]);
@@ -1145,7 +1144,7 @@ function keyDownHandler(e) {
 				}
 				
 				// loop over children and add modified children IDs
-				for (var j = 0; j < nodeChildren.length; j++) {
+				for (let j = 0; j < nodeChildren.length; j++) {
 					// child ID below removed node ID
 					if (nodeChildren[j] < node.id) {
 						nodes[i].children.push(nodeChildren[j]);
@@ -1163,7 +1162,7 @@ function keyDownHandler(e) {
 			nodesIdTable.splice(node.id, 1);
 			
 			// update both arrays
-			for (var i = 0; i < nodes.length; i++) {
+			for (let i = 0; i < nodes.length; i++) {
 				if (nodes[i].id > node.id) nodes[i].id -= 1;
 				if (nodesIdTable[i] > settingsIndx) nodesIdTable[i] -= 1;
 			}
@@ -1227,8 +1226,8 @@ function draw() {
 		node = nodes[nodeSelectLoc];
 		
 		// node relative coordinates
-		var nX = node.x - cameraX;
-		var nY = node.y - cameraY;
+		let nX = node.x - cameraX;
+		let nY = node.y - cameraY;
 		
 		ctx.beginPath();
 		// begin bezier at output circle
@@ -1242,20 +1241,20 @@ function draw() {
 	
 	// draw arrows
 	// loop over nodes
-	for (var i = 0; i < nodes.length; i++) {
-		var node1 = nodes[i];
+	for (let i = 0; i < nodes.length; i++) {
+		let node1 = nodes[i];
 		
 		// node 1 relative coordinates
-		var n1X = node1.x - cameraX;
-		var n1Y = node1.y - cameraY;
+		let n1X = node1.x - cameraX;
+		let n1Y = node1.y - cameraY;
 		
 		// loop over children
-		for (var j = 0; j < node1.children.length; j++) {
-			var node2 = nodes[nodesIdTable[node1.children[j]]];
+		for (let j = 0; j < node1.children.length; j++) {
+			let node2 = nodes[nodesIdTable[node1.children[j]]];
 		
 			// node 2 relative coordinates
-			var n2X = node2.x - cameraX;
-			var n2Y = node2.y - cameraY;
+			let n2X = node2.x - cameraX;
+			let n2Y = node2.y - cameraY;
 			
 			// draw bezier from output circle of parent to input circle of child
 			ctx.beginPath();
@@ -1271,12 +1270,12 @@ function draw() {
 	
 	// draw node boxes
 	// loop over nodes
-	for (var i = 0; i < nodes.length; i++) {
+	for (let i = 0; i < nodes.length; i++) {
 		node = nodes[i];
 		
 		// node relative coordinates
-		var nX = node.x - cameraX;
-		var nY = node.y - cameraY;
+		let nX = node.x - cameraX;
+		let nY = node.y - cameraY;
 		
 		// draw rectangle centered at (x,y)
 		// width and height are twice of node.width and node.height
@@ -1356,10 +1355,10 @@ function draw() {
 		ctx.lineWidth = 2;
 		
 		// spoke size and gear positions
-		var a = 8;
-		var b = a / Math.sqrt(2);
-		var w = nX + node.width  - 15;
-		var h = nY + node.height - 15;
+		let a = 8;
+		let b = a / Math.sqrt(2);
+		let w = nX + node.width  - 15;
+		let h = nY + node.height - 15;
 		
 		// draw gear spokes
 		ctx.beginPath();
@@ -1406,17 +1405,17 @@ function draw() {
 	// draw settings menu
 	if (settingsIndx >= 0) {
 		// selected node and child
-		var node  = nodes[settingsIndx];
-		var child = -1;
+		let node  = nodes[settingsIndx];
+		let child = -1;
 		if (node.children.length > 0) {
 			child = node.children[settingsChild];
 		}
 		
 		// setting menu bounding box
-		var l = cvs.width  / 2 - menuWidth ; // left side
-		var t = cvs.height / 2 - menuHeight; // top side
-		var r = cvs.width  / 2 + menuWidth ; // right side
-		var b = cvs.height / 2 + menuHeight; // bottom side
+		let l = cvs.width  / 2 - menuWidth ; // left side
+		let t = cvs.height / 2 - menuHeight; // top side
+		let r = cvs.width  / 2 + menuWidth ; // right side
+		let b = cvs.height / 2 + menuHeight; // bottom side
 		
 		// draw menu rectangle
 		ctx.beginPath();
@@ -1471,15 +1470,24 @@ function draw() {
 		// text style
 		ctx.fillStyle   = "#000000";
 		ctx.strokeStyle = "#000000";
+
+		// initialize variables
+		let nameText    = "";
+		let formulaText = "";
 		
-		// text input cursors
-		var nameCursor    = settingsMenu == 1 ? "|" : "";
-		var formulaCursor = settingsMenu == 2 ? "|" : "";
+		// largest fitting centered name string
+		if (settingsMenu == 1) {
+			nameText = maxStr(node.name, settingsCursor, menuWidth*2-60, "|", "16px Arial");
+		} else {
+			nameText = maxStr(node.name, 0, menuWidth*2-60, "", "16px Arial");
+		}
 		
-		var nameText    = node.name.substring(0,settingsCursor);
-		nameText += nameCursor + node.name.substring(settingsCursor);
-		var formulaText = node.formula.substring(0,settingsCursor);
-		formulaText += formulaCursor + node.formula.substring(settingsCursor);
+		// largest fitting centered formula string
+		if (settingsMenu == 2) {
+			formulaText = maxStr(node.formula, settingsCursor, menuWidth*2-60, "|", "16px Arial");
+		} else {
+			formulaText = maxStr(node.formula, 0, menuWidth*2-60, "", "16px Arial");
+		}
 		
 		// draw settings menu text
 		ctx.fillText("Delete Node " + node.id + "?", l + 55, t +  17);
@@ -1520,23 +1528,23 @@ function draw() {
 // node updater
 function update() {
 	// loop over nodes
-	for (var i = 0; i < nodes.length; i++) {
-		var node = nodes[i];
+	for (let i = 0; i < nodes.length; i++) {
+		let node = nodes[i];
 
 		// reset values
 		node.error = 0;
 		node.latex = "";
 		
-		var isAtom = false; // is WFF atomic
-		var isWFF  = false; // is WFF not atomic
-		var isEnd  = false; // is end of WFF reached
-		var count  = 0;     // parenthesis checksum
+		let isAtom = false; // is WFF atomic
+		let isWFF  = false; // is WFF not atomic
+		let isEnd  = false; // is end of WFF reached
+		let count  = 0;     // parenthesis checksum
 		
 		// node formula string
-		var str = node.formula;
+		let str = node.formula;
 		
 		// loop through formula and count parenthesis
-		for (var j = 0; j < str.length; j++) {
+		for (let j = 0; j < str.length; j++) {
 			s = str[j]; // current char
 			if (s == " ") { // char is space
 				if (isAtom) { // signify end of atom
@@ -1586,6 +1594,10 @@ function update() {
 			node.WFFTree.type = 1;
 			node.WFFTree.name = node.latex;
 			node.WFFTree.free = [node.latex];
+			node.WFFTree.bindVars();
+			if (node.infRule == 0) {
+				node.error = 7; // no selected inference rule
+			}
 			continue;
 		} else if (!isWFF) { // empty formula
 			node.WFFTree = new WFFClass();
@@ -1593,17 +1605,19 @@ function update() {
 			continue;
 		}
 		
-		var stack     = ""; // identifier string stack
-		var rootArray = []; // array of WFF tree roots
-		var depth     = -1; // rootArray length - 1
+		let stack     = ""; // identifier string stack
+		let rootArray = []; // array of WFF tree roots
+		let depth     = -1; // rootArray length - 1
 		
 		// loop over formula and build WFF
-		for (var j = 0; j < str.length; j++) {
-			var s = str[j]; // current char
+		for (let j = 0; j < str.length; j++) {
+			let s = str[j]; // current char
+			let root =  -1; // initialize root variable
+			
 			// check if char is special
 			if (s == "(" || s == " " || s == ")") {
 				if (stack.length > 0) { // check if identifier exists to push
-					var newNode = new WFFClass();
+					let newNode = new WFFClass();
 					newNode.name = stack;
 					newNode.type = 1;
 					rootArray[depth].args.push(newNode); // push stack to current WFF
@@ -1614,7 +1628,7 @@ function update() {
 			}
 			if (s == "(") { // char is open parens
 				if (rootArray.length > 0) { // check if WFF exists
-					var newNode = new WFFClass();
+					let newNode = new WFFClass();
 					rootArray[depth].args.push(newNode); // push WFF to current WFF
 					rootArray.push(newNode); // push new WFF to become current WFF
 					depth += 1; // update depth
@@ -1624,7 +1638,7 @@ function update() {
 				}
 			}
 			if (s == ")") { // char is close parens
-				var root = rootArray[depth]; // WFF to be removed from rootArray
+				root = rootArray[depth]; // WFF to be removed from rootArray
 				if (root.args.length == 0) { // if parenthesis contain nothing
 					node.error = 3; // missing identifier
 				} else { // else take first argument as WFF name
@@ -1735,7 +1749,7 @@ function update() {
 					// "exists" or "forall" with at least 2 inputs
 					root.type = 5;
 					// check if all but last inputs are atomic
-					for (var k = 0; k < root.args.length - 1; k++) {
+					for (let k = 0; k < root.args.length - 1; k++) {
 						if (root.args[k].type > 1) { // if input is not atomic or special
 							root.type = 2; // set as unmatched
 						}
@@ -1777,8 +1791,8 @@ function update() {
 	recheck();
 	
 	// loop through nodes
-	for (var i = 0; i < nodes.length; i++) {
-		var node = nodes[i];
+	for (let i = 0; i < nodes.length; i++) {
+		let node = nodes[i];
 		
 		// set font style for measurment
 		ctx.font = "16px Arial";
@@ -1798,22 +1812,22 @@ function update() {
 // logic recheker
 function recheck() {
 	// topological sorting
-	var nodesCopy     = []; // reduced copy of nodes keeping connections
-	var startingNodes = []; // nodes with no inputs
-	var topSortTable  = []; // topological sort ID table
+	let nodesCopy     = []; // reduced copy of nodes keeping connections
+	let startingNodes = []; // nodes with no inputs
+	let topSortTable  = []; // topological sort ID table
 	
 	// fill nodesCopy
-	for (var i = 0; i < nodes.length; i++) {
-		var node = new nodeClass(); // reduced copy to be filled
+	for (let i = 0; i < nodes.length; i++) {
+		let node = new nodeClass(); // reduced copy to be filled
 		node.id = i; // node ID
 		
 		// populate children
-		for (var j = 0; j < nodes[nodesIdTable[i]].children.length; j++) {
+		for (let j = 0; j < nodes[nodesIdTable[i]].children.length; j++) {
 			node.children.push(nodes[nodesIdTable[i]].children[j]);
 		}
 		
 		// populate parents
-		for (var j = 0; j < nodes[nodesIdTable[i]].parents.length; j++) {
+		for (let j = 0; j < nodes[nodesIdTable[i]].parents.length; j++) {
 			node.parents.push(nodes[nodesIdTable[i]].parents[j]);
 		}
 		
@@ -1827,16 +1841,16 @@ function recheck() {
 	// Kahn's algorithm
 	while (startingNodes.length > 0) {
 		// remove first node from startingNodes
-		var node = nodesCopy[startingNodes[0]];
+		let node = nodesCopy[startingNodes[0]];
 		startingNodes.splice(0,1);
 		
 		// push position of node
 		topSortTable.push(nodesIdTable[node.id]);
 		
 		// loop over children of node and remove itself as parent
-		for (var i = 0; i < node.children.length; i++) {
+		for (let i = 0; i < node.children.length; i++) {
 			// node child
-			var child = nodesCopy[node.children[i]];
+			let child = nodesCopy[node.children[i]];
 			
 			// remove node as parent of child
 			child.parents.splice(child.parents.indexOf(node.id), 1);
@@ -1849,27 +1863,27 @@ function recheck() {
 	
 	// nodesCopy contains nodes with parents if and only if there are cycles
 	// loop over nodes and check for parents and mark circular logic error if so
-	for (var i = 0; i < nodesCopy.length; i++) {
+	for (let i = 0; i < nodesCopy.length; i++) {
 		if (nodesCopy[i].parents.length > 0) {
 			nodes[nodesIdTable[nodesCopy[i].id]].error = 4; // circular logic
 		}
 	}
 	
 	// loop over nodes amd reset dependencies and validity
-	for (var i = 0; i < nodes.length; i++) {
+	for (let i = 0; i < nodes.length; i++) {
 		nodes[i].valid  = false;
 		nodes[i].scope = [];
 	}
 	
 	// loop over nodes not in cycles
-	for (var i = 0; i < topSortTable.length; i++) {
-		var node = nodes[topSortTable[i]];
+	for (let i = 0; i < topSortTable.length; i++) {
+		let node = nodes[topSortTable[i]];
 		
 		// loop over parents and inherit dependencies
-		for (var j = 0; j < node.parents.length; j++) {
-			var parent = nodes[nodesIdTable[node.parents[j]]];
+		for (let j = 0; j < node.parents.length; j++) {
+			let parent = nodes[nodesIdTable[node.parents[j]]];
 			// loop over parent dependencies
-			for (var k = 0; k < parent.scope.length; k++) {
+			for (let k = 0; k < parent.scope.length; k++) {
 				node.scope.push(parent.scope[k]);
 			}
 		}
@@ -1892,6 +1906,68 @@ function recheck() {
 	}
 }
 
+// maximal fitting and centered string
+function maxStr(str, cut, len, sep, fnt) {
+	// save font style
+	let font = ctx.font;
+	
+	// set font style for measurment
+	ctx.font = fnt;
+	
+	// left and right strings
+	let lstr = "";
+	let rstr = "";
+	
+	// increment counter
+	let n = 0;
+	
+	// find largest left string f0r half width
+	while ((cut >= n) && (ctx.measureText(str.substring(cut-n,cut)).width < len/2)) {
+		lstr = str.substring(cut-n,cut);
+		n += 1;
+	}
+	
+	// reset counter
+	n = 0;
+	
+	// find largest right string for half width
+	while ((cut + n <= str.length) && (ctx.measureText(str.substring(cut,cut+n)).width < len/2)) {
+		rstr = str.substring(cut,cut+n);
+		n += 1;
+	}
+	
+	// string lengths
+	let llen = ctx.measureText(lstr).width;
+	let rlen = ctx.measureText(rstr).width;
+	
+	// if left string is smaller than right string, increase size of right string to max possible size
+	if (llen < rlen) {
+		// reset counter
+		n = rstr.length - 1;
+		
+		// find largest right string
+		while ((cut + n <= str.length) && (ctx.measureText(str.substring(cut,cut+n)).width < len - llen)) {
+			rstr = str.substring(cut,cut+n);
+			n += 1;
+		}
+	} else {
+		// reset counter
+		n = lstr.length - 1;
+		
+		// find largest left string
+		while ((cut >= n) && (ctx.measureText(str.substring(cut-n,cut)).width < len - rlen)) {
+			lstr = str.substring(cut-n,cut);
+			n += 1;
+		}
+	}
+	
+	// reset font
+	ctx.font = font;
+	
+	// return
+	return lstr + sep + rstr;
+}
+
 // inference rule checker functions
 
 // assume
@@ -1911,7 +1987,7 @@ function funcAssume(node) {
 
 // and intro
 function funcAndIntro(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	if (WFF.atomic) { // check if formula is atomic
 		node.error = 13; // conjunction is not introduced
@@ -1925,14 +2001,14 @@ function funcAndIntro(node) {
 	}
 	
 	// WFF value marker array
-	var marker = Array(WFF.args.length).fill(0);
+	let marker = Array(WFF.args.length).fill(0);
 	
 	// loop over parents
-	for (var i = 0; i < node.parents.length; i++) {
-		var pWFF = nodes[nodesIdTable[node.parents[i]]].WFFTree;
-		var found = false; // is argument in node WFF matched?
+	for (let i = 0; i < node.parents.length; i++) {
+		let pWFF = nodes[nodesIdTable[node.parents[i]]].WFFTree;
+		let found = false; // is argument in node WFF matched?
 		// loop over node WFF arguments
-		for (var j = 0; j < WFF.args.length; j++) {
+		for (let j = 0; j < WFF.args.length; j++) {
 			if (marker[j] == 1) continue; // skip over marked arguments
 			if (WFF.args[j].equals(pWFF)) { // check if arguments match
 				marker[j] = 1; // mark
@@ -1948,11 +2024,11 @@ function funcAndIntro(node) {
 	}
 	
 	// loop over unmarked WFF arguments
-	for (var j = 0; j < WFF.args.length; j++) {
+	for (let j = 0; j < WFF.args.length; j++) {
 		if (marker[j] == 1) continue; // skip over marked arguments
 		// loop over parents
-		for (var i = 0; i < node.parents.length; i++) {
-			var pWFF = nodes[nodesIdTable[node.parents[i]]].WFFTree;
+		for (let i = 0; i < node.parents.length; i++) {
+			let pWFF = nodes[nodesIdTable[node.parents[i]]].WFFTree;
 			if (WFF.args[j].equals(pWFF)) { // check if unmarked argument is matched
 				marker[j] = 1;
 			}
@@ -1970,7 +2046,7 @@ function funcAndIntro(node) {
 
 // and elim
 function funcAndElim(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	if (node.parents.length > 1) { // check if too many inputs
 		node.error = 11; // unmatched input propositions
@@ -1981,7 +2057,7 @@ function funcAndElim(node) {
 	}
 	
 	// parent WFF
-	var pWFF = nodes[nodesIdTable[node.parents[0]]].WFFTree;
+	let pWFF = nodes[nodesIdTable[node.parents[0]]].WFFTree;
 	
 	if (pWFF.name != 'and') { // check if single parent is 'and'
 		node.error = 14; // conjunction is not eliminated
@@ -1992,7 +2068,7 @@ function funcAndElim(node) {
 	}
 	
 	// loop over parent arguments
-	for (var i = 0; i < pWFF.args.length; i++) {
+	for (let i = 0; i < pWFF.args.length; i++) {
 		if (WFF.equals(pWFF.args[i])) {
 			node.valid = true;
 			return;
@@ -2004,7 +2080,7 @@ function funcAndElim(node) {
 
 // or intro
 function funcOrIntro(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	if (WFF.atomic) { // check if formula is atomic
 		node.error = 16; // disjunction is not introduced
@@ -2026,11 +2102,11 @@ function funcOrIntro(node) {
 	}
 	
 	// parent WFF
-	var pWFF = nodes[nodesIdTable[node.parents[0]]].WFFTree;
+	let pWFF = nodes[nodesIdTable[node.parents[0]]].WFFTree;
 	
 	
 	// loop over parent arguments
-	for (var i = 0; i < WFF.args.length; i++) {
+	for (let i = 0; i < WFF.args.length; i++) {
 		if (pWFF.equals(WFF.args[i])) { // check if one argument equals proposition
 			node.valid = true;
 			return;
@@ -2042,8 +2118,8 @@ function funcOrIntro(node) {
 
 // or elim
 function funcOrElim(node) {
-	var WFF  = node.WFFTree;
-	var mark = -1;
+	let WFF  = node.WFFTree;
+	let mark = -1;
 	
 	// check if node has inputs.
 	if (node.parents.length == 0) {
@@ -2051,8 +2127,8 @@ function funcOrElim(node) {
 		return;
 	}
 	
-	for (var i = 0; i < node.parents.length; i++) {
-		var pWFF = nodes[nodesIdTable[node.parents[i]]].WFFTree;
+	for (let i = 0; i < node.parents.length; i++) {
+		let pWFF = nodes[nodesIdTable[node.parents[i]]].WFFTree;
 		
 		if (pWFF.equals(WFF)) { // parent node is equal to node propositoin
 			continue;
@@ -2078,7 +2154,7 @@ function funcOrElim(node) {
 		}
 		
 		// loop over inputs and try each as the cases node
-		for (var i = 0; i < node.parents.length; i++) {
+		for (let i = 0; i < node.parents.length; i++) {
 			node.error = 0; // reset node error
 			helpOrElim(node, i);
 			
@@ -2098,29 +2174,29 @@ function funcOrElim(node) {
 // or elim helper
 function helpOrElim(node, mark) {
 	// mark node
-	var mNode = nodes[nodesIdTable[node.parents[mark]]];
+	let mNode = nodes[nodesIdTable[node.parents[mark]]];
 	
-	var  WFF = node.WFFTree;  // node WFF
-	var mWFF = mNode.WFFTree; // mark node WFF
+	let  WFF = node.WFFTree;  // node WFF
+	let mWFF = mNode.WFFTree; // mark node WFF
 	
-	var found   = false; // has proposition been derived from case?
-	var inScope = false; // is proposition in scope of particular parent?
+	let found   = false; // has proposition been derived from case?
+	let inScope = false; // is proposition in scope of particular parent?
 	
 	// reset node scope
-	var scopeTemp = node.scope;
+	let scopeTemp = node.scope;
 	node.scope = [];
 	
 	// loop over mark node arguments
-	for (var i = 0; i < mWFF.args.length; i++) {
-		var aWFF = mWFF.args[i];
+	for (let i = 0; i < mWFF.args.length; i++) {
+		let aWFF = mWFF.args[i];
 		found = false; // reset found variable
 		
 		// loop over parent nodes
-		for (var j = 0; j < node.parents.length; j++) {
+		for (let j = 0; j < node.parents.length; j++) {
 			if (j == mark) {
 				// loop over mark node scope
-				var sNode = nodes[nodesIdTable[node.parents[j]]];
-				for (var k = 0; k < sNode.scope.length; k++) {
+				let sNode = nodes[nodesIdTable[node.parents[j]]];
+				for (let k = 0; k < sNode.scope.length; k++) {
 					node.scope.push(sNode.scope[k]);
 				}
 				// skip to next node
@@ -2131,12 +2207,12 @@ function helpOrElim(node, mark) {
 			inScope = false;
 			
 			// parent node
-			var pNode = nodes[nodesIdTable[node.parents[j]]];
+			let pNode = nodes[nodesIdTable[node.parents[j]]];
 			
 			// loop over parent node scope nodes
 			// check if parent is derived from case
-			for (var k = 0; k < pNode.scope.length; k++) {
-				var sWFF = nodes[nodesIdTable[pNode.scope[k]]].WFFTree;
+			for (let k = 0; k < pNode.scope.length; k++) {
+				let sWFF = nodes[nodesIdTable[pNode.scope[k]]].WFFTree;
 				
 				if (sWFF.equals(aWFF)) {
 					found   = true;
@@ -2152,8 +2228,8 @@ function helpOrElim(node, mark) {
 			
 			// loop over parent node scope nodes
 			// push dependencies
-			for (var k = 0; k < pNode.scope.length; k++) {
-				var sWFF = nodes[nodesIdTable[pNode.scope[k]]].WFFTree;
+			for (let k = 0; k < pNode.scope.length; k++) {
+				let sWFF = nodes[nodesIdTable[pNode.scope[k]]].WFFTree;
 				
 				if (sWFF.equals(aWFF) && !inScope) {
 					inScope = true;
@@ -2177,7 +2253,7 @@ function helpOrElim(node, mark) {
 
 // not intro
 function funcNotIntro(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	// check if proposition is a negation
 	if ((WFF.name != "not") || (WFF.type != 3)) {
@@ -2194,12 +2270,12 @@ function funcNotIntro(node) {
 	}
 	
 	// parent nodes
-	var pNode0 = nodes[nodesIdTable[node.parents[0]]];
-	var pNode1 = nodes[nodesIdTable[node.parents[1]]];
+	let pNode0 = nodes[nodesIdTable[node.parents[0]]];
+	let pNode1 = nodes[nodesIdTable[node.parents[1]]];
 	
 	// parent WFFs
-	var pWFF0 = pNode0.WFFTree;
-	var pWFF1 = pNode1.WFFTree;
+	let pWFF0 = pNode0.WFFTree;
+	let pWFF1 = pNode1.WFFTree;
 	
 	// check if first parent is a negation
 	if ((pWFF0.name == "not") && (pWFF0.type == 3)) {
@@ -2228,11 +2304,11 @@ function funcNotIntro(node) {
 	node.scope = [];
 	
 	// scope has been discharged
-	var found = false;
+	let found = false;
 	
 	// loop over first parent scope
-	for (var i = 0; i < pNode0.scope.length; i++) {
-		var sNode = nodes[nodesIdTable[pNode0.scope[i]]];
+	for (let i = 0; i < pNode0.scope.length; i++) {
+		let sNode = nodes[nodesIdTable[pNode0.scope[i]]];
 		// check if node WFF is negation of scope node
 		// first instance of match gets discharged
 		if ((sNode.WFFTree.equals(WFF.args[0])) && !found) {
@@ -2247,8 +2323,8 @@ function funcNotIntro(node) {
 	found = false;
 	
 	// loop over second parent scope
-	for (var i = 0; i < pNode1.scope.length; i++) {
-		var sNode = nodes[nodesIdTable[pNode1.scope[i]]];
+	for (let i = 0; i < pNode1.scope.length; i++) {
+		let sNode = nodes[nodesIdTable[pNode1.scope[i]]];
 		// check if node WFF is negation of scope node
 		// first instance of match gets discharged
 		if ((sNode.WFFTree.equals(WFF.args[0])) && !found) {
@@ -2267,7 +2343,7 @@ function funcNotIntro(node) {
 
 // not elim
 function funcNotElim(node) {
-var WFF = node.WFFTree;
+let WFF = node.WFFTree;
 	
 	if (node.parents.length > 2) { // check if too many inputs
 		node.error = 11; // unmatched input propositions
@@ -2278,12 +2354,12 @@ var WFF = node.WFFTree;
 	}
 	
 	// parent nodes
-	var pNode0 = nodes[nodesIdTable[node.parents[0]]];
-	var pNode1 = nodes[nodesIdTable[node.parents[1]]];
+	let pNode0 = nodes[nodesIdTable[node.parents[0]]];
+	let pNode1 = nodes[nodesIdTable[node.parents[1]]];
 	
 	// parent WFFs
-	var pWFF0 = pNode0.WFFTree;
-	var pWFF1 = pNode1.WFFTree;
+	let pWFF0 = pNode0.WFFTree;
+	let pWFF1 = pNode1.WFFTree;
 	
 	// check if first parent is a negation
 	if ((pWFF0.name == "not") && (pWFF0.type == 3)) {
@@ -2312,13 +2388,13 @@ var WFF = node.WFFTree;
 	node.scope = [];
 	
 	// scope has been discharged
-	var found = false;
+	let found = false;
 	
 	// loop over first parent scope
-	for (var i = 0; i < pNode0.scope.length; i++) {
-		var sWFF = nodes[nodesIdTable[pNode0.scope[i]]].WFFTree;
-		var cond1 = sWFF.name == "not"; // scope WFF is negation
-		var cond2 = sWFF.type == 3;     // scope WFF is binary
+	for (let i = 0; i < pNode0.scope.length; i++) {
+		let sWFF = nodes[nodesIdTable[pNode0.scope[i]]].WFFTree;
+		let cond1 = sWFF.name == "not"; // scope WFF is negation
+		let cond2 = sWFF.type == 3;     // scope WFF is binary
 		// short circuit when conditions 1 and 2 fail
 		if (!found && cond1 && cond2 && sWFF.args[0].equals(WFF)) {
 			node.valid = true;
@@ -2331,10 +2407,10 @@ var WFF = node.WFFTree;
 	// reset found to discharge additional scopes
 	found = false;
 	
-	for (var i = 0; i < pNode1.scope.length; i++) {
-		var sWFF = nodes[nodesIdTable[pNode1.scope[i]]].WFFTree;
-		var cond1 = sWFF.name == "not"; // scope WFF is negation
-		var cond2 = sWFF.type == 3;     // scope WFF is binary
+	for (let i = 0; i < pNode1.scope.length; i++) {
+		let sWFF = nodes[nodesIdTable[pNode1.scope[i]]].WFFTree;
+		let cond1 = sWFF.name == "not"; // scope WFF is negation
+		let cond2 = sWFF.type == 3;     // scope WFF is binary
 		// short circuit when conditions 1 and 2 fail
 		if (!found && cond1 && cond2 && sWFF.args[0].equals(WFF)) {
 			node.valid = true;
@@ -2352,7 +2428,7 @@ var WFF = node.WFFTree;
 
 // if intro
 function funcIfIntro(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	// check if proposition is conditional
 	if ((WFF.name != 'if') || (WFF.type != 4)) {
@@ -2369,7 +2445,7 @@ function funcIfIntro(node) {
 	}
 	
 	// parent WFF
-	var pNode = nodes[nodesIdTable[node.parents[0]]];
+	let pNode = nodes[nodesIdTable[node.parents[0]]];
 	
 	// check if parent is not consequent of conditional
 	if (!WFF.args[1].equals(pNode.WFFTree)) {
@@ -2381,8 +2457,8 @@ function funcIfIntro(node) {
 	node.scope = [];
 	
 	// loop over parent scope
-	for (var i = 0; i < pNode.scope.length; i++) {
-		var sNode = nodes[nodesIdTable[pNode.scope[i]]];
+	for (let i = 0; i < pNode.scope.length; i++) {
+		let sNode = nodes[nodesIdTable[pNode.scope[i]]];
 		// check if scope matches precedent and no prior match has been made
 		if ((sNode.WFFTree.equals(WFF.args[0])) && !node.valid) {
 			node.valid = true;
@@ -2399,7 +2475,7 @@ function funcIfIntro(node) {
 
 // if elim
 function funcIfElim(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	if (node.parents.length > 2) { // check if too many inputs
 		node.error = 11; // unmatched input propositions
@@ -2410,8 +2486,8 @@ function funcIfElim(node) {
 	}
 	
 	// parent WFFs
-	var pWFF0 = nodes[nodesIdTable[node.parents[0]]].WFFTree;
-	var pWFF1 = nodes[nodesIdTable[node.parents[1]]].WFFTree;
+	let pWFF0 = nodes[nodesIdTable[node.parents[0]]].WFFTree;
+	let pWFF1 = nodes[nodesIdTable[node.parents[1]]].WFFTree;
 	
 	// check if first parent is a conditional
 	if ((pWFF0.name == 'if') && (pWFF0.type == 4)) {
@@ -2452,7 +2528,7 @@ function funcIfElim(node) {
 
 // iff intro
 function funcIffIntro(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	// check if node is not a biconditional
 	if ((WFF.name != "iff") || (WFF.type != 4)) {
@@ -2469,8 +2545,8 @@ function funcIffIntro(node) {
 	}
 	
 	// parent WFFs
-	var pWFF0 = nodes[nodesIdTable[node.parents[0]]].WFFTree;
-	var pWFF1 = nodes[nodesIdTable[node.parents[1]]].WFFTree;
+	let pWFF0 = nodes[nodesIdTable[node.parents[0]]].WFFTree;
+	let pWFF1 = nodes[nodesIdTable[node.parents[1]]].WFFTree;
 	
 	// check if first parent is not a conditional
 	if ((pWFF0.name != "if") || (pWFF0.type != 4)) {
@@ -2485,14 +2561,14 @@ function funcIffIntro(node) {
 	}
 	
 	// check if biconditional matches any entries in each conditional
-	var a1 = pWFF0.args[0].equals(WFF.args[0]);
-	var b1 = pWFF0.args[1].equals(WFF.args[1]);
-	var c1 = pWFF1.args[0].equals(WFF.args[1]);
-	var d1 = pWFF1.args[1].equals(WFF.args[0]);
-	var a2 = pWFF0.args[0].equals(WFF.args[1]);
-	var b2 = pWFF0.args[1].equals(WFF.args[0]);
-	var c2 = pWFF1.args[0].equals(WFF.args[0]);
-	var d2 = pWFF1.args[1].equals(WFF.args[1]);
+	let a1 = pWFF0.args[0].equals(WFF.args[0]);
+	let b1 = pWFF0.args[1].equals(WFF.args[1]);
+	let c1 = pWFF1.args[0].equals(WFF.args[1]);
+	let d1 = pWFF1.args[1].equals(WFF.args[0]);
+	let a2 = pWFF0.args[0].equals(WFF.args[1]);
+	let b2 = pWFF0.args[1].equals(WFF.args[0]);
+	let c2 = pWFF1.args[0].equals(WFF.args[0]);
+	let d2 = pWFF1.args[1].equals(WFF.args[1]);
 	
 	// check if first conditional matches biconditional and second conditional is reversed
 	// or the same with the first and second conditionals swapped
@@ -2505,7 +2581,7 @@ function funcIffIntro(node) {
 
 // iff elim
 function funcIffElim(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	if (node.parents.length > 1) { // check if too many inputs
 		node.error = 11; // unmatched input propositions
@@ -2516,7 +2592,7 @@ function funcIffElim(node) {
 	}
 	
 	// parent WFF
-	var pWFF = nodes[nodesIdTable[node.parents[0]]].WFFTree;
+	let pWFF = nodes[nodesIdTable[node.parents[0]]].WFFTree;
 	
 	// check if parent WFF is not a biconditional
 	if ((pWFF.name != "iff") || (pWFF.type != 4)) {
@@ -2531,10 +2607,10 @@ function funcIffElim(node) {
 	}
 	
 	// check if conditional matches biconditional
-	var a1 = pWFF.args[0].equals(WFF.args[0]);
-	var b1 = pWFF.args[1].equals(WFF.args[1]);
-	var a2 = pWFF.args[0].equals(WFF.args[1]);
-	var b2 = pWFF.args[1].equals(WFF.args[0]);
+	let a1 = pWFF.args[0].equals(WFF.args[0]);
+	let b1 = pWFF.args[1].equals(WFF.args[1]);
+	let a2 = pWFF.args[0].equals(WFF.args[1]);
+	let b2 = pWFF.args[1].equals(WFF.args[0]);
 	
 	// check if conditional matches biconditional or reversed biconditional
 	if ((a1 && b1) || (a2 && b2)) {
@@ -2552,7 +2628,7 @@ function funcEqualsIntro(node) {
 		return;
 	}
 	
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	if (WFF.atomic) { // check if formula is atomic
 		node.error = 33; // equality is not introduced
@@ -2566,7 +2642,7 @@ function funcEqualsIntro(node) {
 	}
 	
 	// loop over WFF arguments
-	for (var i = 1; i < WFF.args.length; i++) {
+	for (let i = 1; i < WFF.args.length; i++) {
 		// check if term is not equal to first term
 		if (!WFF.args[0].equals(WFF.args[i])) {
 			node.error = 34; // propositions are not equal
@@ -2580,7 +2656,7 @@ function funcEqualsIntro(node) {
 
 // equals elim
 function funcEqualsElim(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	if (node.parents.length > 2) { // check if too many inputs
 		node.error = 11; // unmatched input propositions
@@ -2591,7 +2667,7 @@ function funcEqualsElim(node) {
 	}
 	
 	// parents 1 WFF
-	var pWFF0 = nodes[nodesIdTable[node.parents[0]]].WFFTree;
+	let pWFF0 = nodes[nodesIdTable[node.parents[0]]].WFFTree;
 	
 	if (node.parents.length == 1) {
 		if (pWFF0.name == "=") {
@@ -2606,14 +2682,14 @@ function funcEqualsElim(node) {
 	}
 	
 	// parent 2 WFF
-	var pWFF1 = nodes[nodesIdTable[node.parents[1]]].WFFTree;
+	let pWFF1 = nodes[nodesIdTable[node.parents[1]]].WFFTree;
 	
 	if ((pWFF0.name != "=") && (pWFF1.name != "=")) {
 		node.error = 35; // equality is not eliminated
 		return;
 	}
 	
-	var temp = false; // true if equality subsitues free and bound variables
+	let temp = false; // true if equality subsitues free and bound variables
 	
 	// check if first parent is equality
 	if (pWFF0.name == "=") {
@@ -2622,7 +2698,7 @@ function funcEqualsElim(node) {
 		}
 		
 		// loop over equal terms
-		for (var i = 0; i < pWFF0.args.length; i++) {
+		for (let i = 0; i < pWFF0.args.length; i++) {
 			// check if term in equality is a bound variable
 			if (pWFF1.bndb.includes(pWFF0.args[i].name)) temp = true;
 		}
@@ -2636,7 +2712,7 @@ function funcEqualsElim(node) {
 		}
 		
 		// loop over equal terms
-		for (var i = 0; i < pWFF1.args.length; i++) {
+		for (let i = 0; i < pWFF1.args.length; i++) {
 			// check if term in equality is a bound variable
 			if (pWFF0.bndb.includes(pWFF1.args[i].name)) temp = true;
 		}
@@ -2654,7 +2730,7 @@ function funcEqualsElim(node) {
 
 // forall intro
 function funcForallIntro(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	// check if proposition is universal quantifier
 	if ((WFF.name != 'forall') || (WFF.type != 5)) {
@@ -2671,24 +2747,24 @@ function funcForallIntro(node) {
 	}
 	
 	// bound variables
-	var bVar = [];
+	let bVar = [];
 	
 	// loop over WFF args and push bound variable names to bVar
-	for (var i = 0; i < WFF.args.length - 1; i++) {
+	for (let i = 0; i < WFF.args.length - 1; i++) {
 		bVar.push(WFF.args[i].name);
 	}
 	
 	// quantified WFF
-	var qWFF = WFF.args[WFF.args.length - 1];
+	let qWFF = WFF.args[WFF.args.length - 1];
 	
 	// parent node
-	var pNode = nodes[nodesIdTable[node.parents[0]]];
+	let pNode = nodes[nodesIdTable[node.parents[0]]];
 	
 	// parent WFF
-	var pWFF = pNode.WFFTree;
+	let pWFF = pNode.WFFTree;
 	
 	// loop over bound variables of proposition
-	for (var i = 0; i < WFF.args.length - 1; i++) {
+	for (let i = 0; i < WFF.args.length - 1; i++) {
 		// check if bound variable is free in parent
 		if (pWFF.free.includes(WFF.args[i].name)) {
 			node.error = 38; // bound variable is present in input
@@ -2702,10 +2778,10 @@ function funcForallIntro(node) {
 	}
 	
 	// variable substitution pairs
-	var pairs = [];
+	let pairs = [];
 	
 	// populate pairs and determine if WFFs are equal up to variable substitution
-	var pass = qWFF.forallIntro(pWFF, pairs);
+	let pass = qWFF.forallIntro(pWFF, pairs);
 	
 	// check if WFFs are equal up to variable substitution
 	if (!pass) {
@@ -2714,11 +2790,11 @@ function funcForallIntro(node) {
 	}
 	
 	// remove duplicate pairs
-	var temp1 = []; // unique pairs
-	var temp2 = []; // pair fingerprints
+	let temp1 = []; // unique pairs
+	let temp2 = []; // pair fingerprints
 	
 	// loop over pairs
-	for (var i = 0; i < pairs.length; i++) {
+	for (let i = 0; i < pairs.length; i++) {
 		if (!temp2.includes(pairs[i][0] + " " + pairs[i][1])) {
 			temp2.push(pairs[i][0] + " " + pairs[i][1]);
 			temp1.push(pairs[i]);
@@ -2729,10 +2805,10 @@ function funcForallIntro(node) {
 	pairs = temp1;
 	
 	// seen substituted variables in parent
-	var sVar = [];
+	let sVar = [];
 	
 	// loop over pairs
-	for (var i = 0; i < pairs.length; i++) {
+	for (let i = 0; i < pairs.length; i++) {
 		// check if first term of pair is not bound variable of WFF
 		if (!bVar.includes(pairs[i][0])) {
 			node.error = 39; // proposition is not generalization of input
@@ -2761,11 +2837,11 @@ function funcForallIntro(node) {
 	}
 	
 	// loop over scope of parent
-	for (var i = 0; i < pNode.scope.length; i++) {
-		var sWFF = nodes[nodesIdTable[pNode.scope[i]]].WFFTree;
+	for (let i = 0; i < pNode.scope.length; i++) {
+		let sWFF = nodes[nodesIdTable[pNode.scope[i]]].WFFTree;
 		
 		// loop over bound variables
-		for (var j = 0; j < sVar.length; j++) {
+		for (let j = 0; j < sVar.length; j++) {
 			if (sWFF.free.includes(sVar[i])) {
 				node.error = 42; // arbitrary variable of input is free in scope of input
 				return;
@@ -2779,7 +2855,7 @@ function funcForallIntro(node) {
 
 // forall elim
 function funcForallElim(node) {
-	var WFF = node.WFFTree;
+	let WFF = node.WFFTree;
 	
 	if (node.parents.length > 1) { // check if too many inputs
 		node.error = 11; // unmatched input propositions
@@ -2790,7 +2866,7 @@ function funcForallElim(node) {
 	}
 	
 	// parent WFF
-	var pWFF = nodes[nodesIdTable[node.parents[0]]].WFFTree;
+	let pWFF = nodes[nodesIdTable[node.parents[0]]].WFFTree;
 	
 	// check if parent WFF is not a universal quantifier
 	if ((pWFF.name != "forall") || (pWFF.type != 5)) {
@@ -2799,7 +2875,7 @@ function funcForallElim(node) {
 	}
 	
 	// parent error ID
-	var pErr = nodes[nodesIdTable[node.parents[0]]].error;
+	let pErr = nodes[nodesIdTable[node.parents[0]]].error;
 	
 	// check if parent WFF is a valid quantifier
 	if ((pErr == 5) || (pErr == 6)) {
@@ -2808,18 +2884,18 @@ function funcForallElim(node) {
 	}
 	
 	// parent quantified WFF
-	var pqWFF = pWFF.args[pWFF.args.length - 1];
+	let pqWFF = pWFF.args[pWFF.args.length - 1];
 	
 	// test bounding variables being set
 	// k = 0 : test for all bound variables being set
 	// k = 1 : test for some bound variables being set
-	for (var k = 0; k < 2; k++) {
+	for (let k = 0; k < 2; k++) {
 		// bound variable substitution pairs
-		var pairs = [];
+		let pairs = [];
 		
 		if (k == 0) {
 			// populate pairs
-			for (var i = 0; i < pWFF.args.length - 1; i++) {
+			for (let i = 0; i < pWFF.args.length - 1; i++) {
 				pairs.push([pWFF.args[i].name, -1]);
 			}
 			
@@ -2828,10 +2904,10 @@ function funcForallElim(node) {
 			
 			// check if WFF is universal quantifier
 		} else if ((WFF.name == "forall") && (WFF.type == 5)){
-			var index = 0; // WFF bound variable cursor
+			let index = 0; // WFF bound variable cursor
 			
 			// loop over parent WFF bound variables
-			for (var i = 0; i < pWFF.args.length - 1; i++) {
+			for (let i = 0; i < pWFF.args.length - 1; i++) {
 				// check if index is in range and corresponding bound variables match
 				if ((index < WFF.args.length) && (pWFF.args[i].name == WFF.args[index].name)) {
 					index += 1; // increment index
@@ -2860,13 +2936,13 @@ function funcForallElim(node) {
 		}
 		
 		// check if all variables have been assigned
-		var check = true;
+		let check = true;
 	
 		// check if substitution raised no errors
 		if (node.error == 0) {
 			// check if free variables of WFF differ from bound variables of parent WFF
 			// loop over WFF free variables
-			for (var i = 0; i < WFF.free.length; i++) {
+			for (let i = 0; i < WFF.free.length; i++) {
 				if (pWFF.bndb.includes(WFF.free[i])) {
 					node.error = 46; // bound variable of input is free in proposition
 				}
@@ -2875,7 +2951,7 @@ function funcForallElim(node) {
 			// only run when node is still error free
 			if (node.error == 0) {
 				// loop over pairs
-				for (var i = 0; i < pairs.length; i++) {
+				for (let i = 0; i < pairs.length; i++) {
 					// check if variable remains unassigned
 					if (pairs[i][1] == -1) {
 						// check if bound variable is present in parent WFF
@@ -2886,7 +2962,7 @@ function funcForallElim(node) {
 						}
 					} else { // check if assignment contains bound variable
 						// loop over WFF bound variables
-						for (var j = 0; j < WFF.bndb.length; j++) {
+						for (let j = 0; j < WFF.bndb.length; j++) {
 							// unbind parent WFF
 							pWFF.unbindVars();
 							
@@ -2920,7 +2996,6 @@ function funcForallElim(node) {
 		}
 	}
 }		
-
 
 // exists intro
 function funcExistsIntro(node) {}
